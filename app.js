@@ -5,18 +5,18 @@ const session = require('express-session');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
-    secret: 'snippet-secret-key',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }
+  secret: 'snippet-secret-key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
 }));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
+});
 
 // Password admin
 const ADMIN_PASSWORD = 'ilhamganteng';
