@@ -1,0 +1,57 @@
+const axios = require("axios");
+const cheerio = require("cheerio");
+
+async function scrapeProfile(username) {
+    const url = `https://insta-stories-viewer.com/${username}/`;
+
+    const { data: html } = await axios.get(url, {
+        headers: {
+            "User-Agent": "Mozilla/5.0"
+        }
+    });
+
+    const $ = cheerio.load(html);
+
+    const cleanUsername = $(".profile__nickname")
+        .clone()
+        .children()
+        .remove()
+        .end()
+        .text()
+        .trim();
+
+    const followers = parseInt(
+        $(".profile__stats-followers").text().replace(/\D/g, "")
+    );
+
+    const following = parseInt(
+        $(".profile__stats-follows").text().replace(/\D/g, "")
+    );
+
+    const posts = parseInt(
+        $(".profile__stats-posts").text().replace(/\D/g, "")
+    );
+
+    const description = $(".profile__description").text().trim();
+
+    const profilePicture =
+        $(".profile__avatar-pic").attr("src") || null;
+
+    const bioLinks =
+        description.match(/(https?:\/\/[^\s]+)/gi) || [];
+
+    return {
+        username: cleanUsername,
+        followers,
+        following,
+        posts,
+        profile_picture: profilePicture,
+        bio_links: bioLinks,
+        description
+    };
+}
+
+(async () => {
+    const data = await scrapeProfile("ilhammworst");
+    console.log(JSON.stringify(data, null, 2));
+})();
